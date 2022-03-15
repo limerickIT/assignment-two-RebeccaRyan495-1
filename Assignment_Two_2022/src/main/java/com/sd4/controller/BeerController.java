@@ -12,14 +12,17 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,7 +36,9 @@ public class BeerController {
     
     @Autowired
     private BeerService beerService;
-    @RequestMapping("")
+    
+    @RequestMapping("beers")
+    
     @GetMapping(value="beers", produces=MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Beer>> getAll() {
         List<Beer> aList = beerService.findAll();
@@ -44,8 +49,25 @@ public class BeerController {
         }
         else
         {
+            Link selfLink = linkTo(methodOn(BeerController.class).getAll()).withSelfRel();
             return ResponseEntity.ok(aList);
         }
+    }
+    @GetMapping(value="beersHAOS", produces=MediaTypes.HAL_JSON_VALUE)
+    public CollectionModel<Beer> getAllBeerHAOS(){
+        List<Beer> aList = beerService.findAll();
+        
+        for(final Beer b : aList)
+        {
+            //this will eventually be link to beer details drilldown, shows ID now
+            long id = b.getId();
+            Link selfLink = linkTo(BeerController.class).slash(id).withSelfRel();
+            b.add(selfLink);
+        }
+        //nothing currently appearing, trying to show all beers, self
+        Link link = linkTo(methodOn(BeerController.class).getAll()).withSelfRel();
+        CollectionModel<Beer> result = CollectionModel.of(aList, link);
+        return result;
     }
     
     @GetMapping(value ="/{id}", produces={MediaTypes.HAL_JSON_VALUE})
@@ -58,17 +80,32 @@ public class BeerController {
             else
             {    
                //Link selfLink = new Link("http://localhost:8888/beers/");
-               Link selfLink = linkTo(methodOn(BeerController.class).getOne(id)).withSelfRel();
-               b.get().add(selfLink);
+               Link allLink = linkTo(methodOn(BeerController.class).getAll()).withRel("beers");
+               b.get().add(allLink);
+               
                return ResponseEntity.ok(b.get()); 
             }
     }
         
-    @PostMapping(value="", consumes={MediaType.APPLICATION_JSON_VALUE})
+    @PostMapping(value="/beers/", consumes={MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity add(@RequestBody Beer b)
     {
         beerService.saveBeer(b);
         return new ResponseEntity(HttpStatus.CREATED);
+    }
+    
+    @PutMapping(value="/beers/", consumes={MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity update(@RequestBody Beer b)
+    {
+        beerService.editBeer(b);
+        return new ResponseEntity(HttpStatus.OK);
+    }
+    
+    @DeleteMapping(value="/beers/{id}", consumes={MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity delete(@PathVariable long id)
+    {
+        beerService.deleteBeerByID(id);
+        return new ResponseEntity(HttpStatus.OK);
     }
     
 }

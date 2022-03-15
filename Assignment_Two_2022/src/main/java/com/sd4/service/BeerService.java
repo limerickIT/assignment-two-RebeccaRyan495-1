@@ -40,4 +40,8 @@ public class BeerService {
         beerRepo.save(b);
     } 
     
+    public void deleteBeerByID(long beerID) {
+        beerRepo.deleteById(beerID);
+    }
+    
 }//end class
