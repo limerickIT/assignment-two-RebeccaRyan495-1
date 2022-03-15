@@ -39,33 +39,33 @@ public class BeerController {
     
     @RequestMapping("beers")
     
-    @GetMapping(value="beers", produces=MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Beer>> getAll() {
-        List<Beer> aList = beerService.findAll();
-        
-        if(aList.isEmpty())
-        {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
-        }
-        else
-        {
-            Link selfLink = linkTo(methodOn(BeerController.class).getAll()).withSelfRel();
-            return ResponseEntity.ok(aList);
-        }
-    }
+//    @GetMapping(value="beers", produces=MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<List<Beer>> getAll() {
+//        List<Beer> aList = beerService.findAll();
+//        
+//        if(aList.isEmpty())
+//        {
+//            return new ResponseEntity(HttpStatus.NOT_FOUND);
+//        }
+//        else
+//        {
+//            Link selfLink = linkTo(methodOn(BeerController.class).getAll()).withSelfRel();
+//            return ResponseEntity.ok(aList);
+//        }
+//    }
     @GetMapping(value="beersHAOS", produces=MediaTypes.HAL_JSON_VALUE)
     public CollectionModel<Beer> getAllBeerHAOS(){
         List<Beer> aList = beerService.findAll();
         
         for(final Beer b : aList)
         {
-            //this will eventually be link to beer details drilldown, shows ID now
+            
             long id = b.getId();
             Link selfLink = linkTo(BeerController.class).slash(id).withSelfRel();
             b.add(selfLink);
         }
-        //nothing currently appearing, trying to show all beers, self
-        Link link = linkTo(methodOn(BeerController.class).getAll()).withSelfRel();
+        
+        Link link = linkTo(methodOn(BeerController.class).getAllBeerHAOS()).withSelfRel();
         CollectionModel<Beer> result = CollectionModel.of(aList, link);
         return result;
     }
@@ -80,7 +80,7 @@ public class BeerController {
             else
             {    
                //Link selfLink = new Link("http://localhost:8888/beers/");
-               Link allLink = linkTo(methodOn(BeerController.class).getAll()).withRel("beers");
+               Link allLink = linkTo(methodOn(BeerController.class).getAllBeerHAOS()).withRel("beers");
                b.get().add(allLink);
                
                return ResponseEntity.ok(b.get()); 
