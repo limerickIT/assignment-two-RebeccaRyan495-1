@@ -8,6 +8,8 @@ package com.sd4.controller;
 import com.sd4.model.Beer;
 import com.sd4.service.BeerService;
 import java.util.List;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
@@ -55,7 +57,8 @@ public class BeerController {
             }
             else
             {    
-               Link selfLink = new Link("http://localhost:8888/beers/" + id).withSelfRel();
+               //Link selfLink = new Link("http://localhost:8888/beers/");
+               Link selfLink = linkTo(methodOn(BeerController.class).getOne(id)).withSelfRel();
                b.get().add(selfLink);
                return ResponseEntity.ok(b.get()); 
             }
