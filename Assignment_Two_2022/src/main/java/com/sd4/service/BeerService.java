@@ -36,4 +36,8 @@ public class BeerService {
         beerRepo.save(b);
     }  
     
+    public void saveBeer(Beer b) {
+        beerRepo.save(b);
+    } 
+    
 }//end class

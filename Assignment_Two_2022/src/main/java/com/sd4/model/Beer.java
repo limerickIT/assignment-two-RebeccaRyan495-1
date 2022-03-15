@@ -20,6 +20,8 @@ import lombok.ToString;
 
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.RepresentationModel;
 
 @Getter
 @Setter
@@ -27,7 +29,7 @@ import javax.persistence.Lob;
 @AllArgsConstructor
 @ToString
 @Entity
-public class Beer implements Serializable {
+public class Beer extends RepresentationModel<Beer> implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -50,5 +52,9 @@ public class Beer implements Serializable {
     private String image;
     private Double buy_price;
     private Double sell_price;
+
+//    public void add(Link selfLink) {
+//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+//    }
 
 }
