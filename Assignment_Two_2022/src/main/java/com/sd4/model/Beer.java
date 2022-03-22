@@ -53,8 +53,5 @@ public class Beer extends RepresentationModel<Beer> implements Serializable {
     private Double buy_price;
     private Double sell_price;
 
-//    public void add(Link selfLink) {
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-//    }
 
 }

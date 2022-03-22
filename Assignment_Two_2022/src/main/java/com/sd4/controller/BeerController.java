@@ -32,28 +32,13 @@ import org.springframework.web.bind.annotation.RestController;
  * @author rebec
  */
 @RestController
+@RequestMapping("beers")
 public class BeerController {
     
     @Autowired
     private BeerService beerService;
     
-    @RequestMapping("beers")
-    
-//    @GetMapping(value="beers", produces=MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<List<Beer>> getAll() {
-//        List<Beer> aList = beerService.findAll();
-//        
-//        if(aList.isEmpty())
-//        {
-//            return new ResponseEntity(HttpStatus.NOT_FOUND);
-//        }
-//        else
-//        {
-//            Link selfLink = linkTo(methodOn(BeerController.class).getAll()).withSelfRel();
-//            return ResponseEntity.ok(aList);
-//        }
-//    }
-    @GetMapping(value="beersHAOS", produces=MediaTypes.HAL_JSON_VALUE)
+    @GetMapping(value="HAOS", produces=MediaTypes.HAL_JSON_VALUE)
     public CollectionModel<Beer> getAllBeerHAOS(){
         List<Beer> aList = beerService.findAll();
         
@@ -63,6 +48,11 @@ public class BeerController {
             long id = b.getId();
             Link selfLink = linkTo(BeerController.class).slash(id).withSelfRel();
             b.add(selfLink);
+            
+            String beerDesc = b.getDescription();
+            String beerName = b.getName();
+            String breweryName;
+            Link link = linkTo(BeerController.class).slash(id).withSelfRel();
         }
         
         Link link = linkTo(methodOn(BeerController.class).getAllBeerHAOS()).withSelfRel();
@@ -76,6 +66,7 @@ public class BeerController {
             if(!b.isPresent())
             {
                 return new ResponseEntity(HttpStatus.NOT_FOUND);
+                
             }
             else
             {    
@@ -87,21 +78,21 @@ public class BeerController {
             }
     }
         
-    @PostMapping(value="/beers/", consumes={MediaType.APPLICATION_JSON_VALUE})
+    @PostMapping(consumes={MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity add(@RequestBody Beer b)
     {
         beerService.saveBeer(b);
         return new ResponseEntity(HttpStatus.CREATED);
     }
     
-    @PutMapping(value="/beers/", consumes={MediaType.APPLICATION_JSON_VALUE})
+    @PutMapping(consumes={MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity update(@RequestBody Beer b)
     {
         beerService.editBeer(b);
         return new ResponseEntity(HttpStatus.OK);
     }
     
-    @DeleteMapping(value="/beers/{id}", consumes={MediaType.APPLICATION_JSON_VALUE})
+    @DeleteMapping(value="/{id}", consumes={MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity delete(@PathVariable long id)
     {
         beerService.deleteBeerByID(id);
