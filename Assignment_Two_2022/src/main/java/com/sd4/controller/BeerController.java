@@ -7,6 +7,7 @@ package com.sd4.controller;
 
 import com.sd4.model.Beer;
 import com.sd4.service.BeerService;
+import com.sd4.service.BreweryService;
 import java.util.List;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +39,7 @@ public class BeerController {
     
     @Autowired
     private BeerService beerService;
+    private BreweryService breweryService;
     
     @GetMapping(value="HAOS", produces=MediaTypes.HAL_JSON_VALUE)
     public CollectionModel<Beer> getAllBeerHAOS(){
@@ -49,10 +52,9 @@ public class BeerController {
             Link selfLink = linkTo(BeerController.class).slash(id).withSelfRel();
             b.add(selfLink);
             
-            String beerDesc = b.getDescription();
-            String beerName = b.getName();
-            String breweryName;
-            Link link = linkTo(BeerController.class).slash(id).withSelfRel();
+            Link drilldown = linkTo(BeerController.class).slash(id).slash("drilldown").withSelfRel();
+            b.add(drilldown);
+            
         }
         
         Link link = linkTo(methodOn(BeerController.class).getAllBeerHAOS()).withSelfRel();
@@ -73,7 +75,6 @@ public class BeerController {
                //Link selfLink = new Link("http://localhost:8888/beers/");
                Link allLink = linkTo(methodOn(BeerController.class).getAllBeerHAOS()).withRel("beers");
                b.get().add(allLink);
-               
                return ResponseEntity.ok(b.get()); 
             }
     }
@@ -97,6 +98,12 @@ public class BeerController {
     {
         beerService.deleteBeerByID(id);
         return new ResponseEntity(HttpStatus.OK);
+    }
+    
+    @GetMapping(value="/{name}/{id}/drilldown", produces={MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<Beer> getBeerDetails(@PathVariable long id)
+    {
+          
     }
     
 }
