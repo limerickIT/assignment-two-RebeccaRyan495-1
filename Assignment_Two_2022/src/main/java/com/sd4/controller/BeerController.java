@@ -6,6 +6,8 @@
 package com.sd4.controller;
 
 import com.sd4.model.Beer;
+import com.sd4.model.BeerBrewery;
+import com.sd4.model.Brewery;
 import com.sd4.service.BeerService;
 import com.sd4.service.BreweryService;
 import java.util.List;
@@ -36,74 +38,87 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("beers")
 public class BeerController {
-    
+
     @Autowired
     private BeerService beerService;
+    @Autowired
     private BreweryService breweryService;
-    
-    @GetMapping(value="HAOS", produces=MediaTypes.HAL_JSON_VALUE)
-    public CollectionModel<Beer> getAllBeerHAOS(){
+
+    @GetMapping(value = "HAOS", produces = MediaTypes.HAL_JSON_VALUE)
+    public CollectionModel<Beer> getAllBeerHAOS() {
         List<Beer> aList = beerService.findAll();
-        
-        for(final Beer b : aList)
-        {
-            
+
+        for (final Beer b : aList) {
+
             long id = b.getId();
             Link selfLink = linkTo(BeerController.class).slash(id).withSelfRel();
             b.add(selfLink);
-            
-            Link drilldown = linkTo(BeerController.class).slash(id).slash("drilldown").withSelfRel();
+
+            Link drilldown = linkTo(methodOn(BeerController.class).getBeerDetails(id)).withRel("details");
             b.add(drilldown);
-            
+
         }
-        
+
         Link link = linkTo(methodOn(BeerController.class).getAllBeerHAOS()).withSelfRel();
         CollectionModel<Beer> result = CollectionModel.of(aList, link);
         return result;
     }
-    
-    @GetMapping(value ="/{id}", produces={MediaTypes.HAL_JSON_VALUE})
-        public ResponseEntity<Beer> getOne(@PathVariable long id){
-            Optional<Beer> b = beerService.findOne(id);
-            if(!b.isPresent())
-            {
-                return new ResponseEntity(HttpStatus.NOT_FOUND);
-                
-            }
-            else
-            {    
-               //Link selfLink = new Link("http://localhost:8888/beers/");
-               Link allLink = linkTo(methodOn(BeerController.class).getAllBeerHAOS()).withRel("beers");
-               b.get().add(allLink);
-               return ResponseEntity.ok(b.get()); 
-            }
+
+    @GetMapping(value = "/{id}", produces = {MediaTypes.HAL_JSON_VALUE})
+    public ResponseEntity<Beer> getOne(@PathVariable long id) {
+        Optional<Beer> b = beerService.findOne(id);
+        if (!b.isPresent()) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+
+        } else {
+            //Link selfLink = new Link("http://localhost:8888/beers/");
+            Link allLink = linkTo(methodOn(BeerController.class).getAllBeerHAOS()).withRel("beers");
+            b.get().add(allLink);
+            return ResponseEntity.ok(b.get());
+        }
     }
-        
-    @PostMapping(consumes={MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity add(@RequestBody Beer b)
-    {
+
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity add(@RequestBody Beer b) {
         beerService.saveBeer(b);
         return new ResponseEntity(HttpStatus.CREATED);
     }
-    
-    @PutMapping(consumes={MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity update(@RequestBody Beer b)
-    {
+
+    @PutMapping(consumes = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity update(@RequestBody Beer b) {
         beerService.editBeer(b);
         return new ResponseEntity(HttpStatus.OK);
     }
-    
-    @DeleteMapping(value="/{id}", consumes={MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity delete(@PathVariable long id)
-    {
+
+    @DeleteMapping(value = "/{id}", consumes = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity delete(@PathVariable long id) {
         beerService.deleteBeerByID(id);
         return new ResponseEntity(HttpStatus.OK);
     }
-    
-    @GetMapping(value="/{name}/{id}/drilldown", produces={MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<Beer> getBeerDetails(@PathVariable long id)
-    {
-          
+
+    @GetMapping(value = "/{id}/details", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<BeerBrewery> getBeerDetails(@PathVariable long id) {
+
+        Optional<Beer> b = beerService.findOne(id);
+
+        //List<Brewery> breweryList = breweryService.findAll();
+        if (!b.isPresent()) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        } 
+        else 
+        {
+            System.out.println("before");
+            Beer beer = b.get();
+            System.out.println("after");
+            long breweryID = beer.getBrewery_id();
+            System.out.println(breweryID);
+            
+            Optional<Brewery> brewery = breweryService.findOne(breweryID);
+            Brewery brew = brewery.get();
+            System.out.println(brew);
+            BeerBrewery bb = new BeerBrewery(brew.getName(), beer.getName(), beer.getDescription());
+            return ResponseEntity.ok(bb);
+        }
     }
-    
+
 }

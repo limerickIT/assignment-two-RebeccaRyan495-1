@@ -7,6 +7,7 @@ package com.sd4.controller;
 
 import com.sd4.model.Brewery;
 import com.sd4.service.BreweryService;
+import com.sd4.service.MapService;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,7 @@ public class BreweryController {
     
     @Autowired
     private BreweryService breweryService;
+    private MapService mapService;
     
     @GetMapping(value="/HAOS", produces=MediaTypes.HAL_JSON_VALUE)
     public CollectionModel<Brewery> getAllBreweryHAOS(){
@@ -42,6 +44,9 @@ public class BreweryController {
             long id = b.getId();
             Link selfLink = linkTo(BreweryController.class).slash(id).withSelfRel();
             b.add(selfLink);
+            
+            Link mapLink = linkTo(BreweryController.class).slash(id).slash("maps").withSelfRel();
+            b.add(mapLink);
             
         }
         
@@ -66,6 +71,11 @@ public class BreweryController {
                return ResponseEntity.ok(b.get()); 
             }
     }
+       
+//    @GetMapping(value ="/{id}/maps", produces={MediaTypes.HAL_JSON_VALUE})
+//    public ResponseEntity<Brewery> getMap(@PathVariable long id){
+//        
+//    }
         
     
 }

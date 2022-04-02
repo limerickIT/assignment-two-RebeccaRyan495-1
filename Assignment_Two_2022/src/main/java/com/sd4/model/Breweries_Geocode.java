@@ -32,7 +32,7 @@ public class Breweries_Geocode implements Serializable {
    @GeneratedValue(strategy = GenerationType.IDENTITY)
    long id ;
    long brewery_id;
-   Double latitude;
-   Double longitude;
+   double latitude;
+   double longitude;
     
 }

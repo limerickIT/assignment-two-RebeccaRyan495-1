@@ -21,7 +21,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 public class BeerBrewery {
-     private String name;
+     private String brewName;
      private String beerName;
      private String description;
 }

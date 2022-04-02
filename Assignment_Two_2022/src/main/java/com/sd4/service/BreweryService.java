@@ -5,9 +5,7 @@
  */
 package com.sd4.service;
 
-import com.sd4.model.Beer;
 import com.sd4.model.Brewery;
-import com.sd4.repository.BeerRepository;
 import com.sd4.repository.BreweryRepository;
 import java.util.List;
 import java.util.Optional;
@@ -34,16 +32,16 @@ public class BreweryService {
     }
   
     
-    public void editBeer(Brewery b) {
+    public void editBrewery(Brewery b) {
         breweryRepo.save(b);
     }  
     
-    public void saveBeer(Brewery b) {
+    public void saveBrewery(Brewery b) {
         breweryRepo.save(b);
     } 
     
-    public void deleteBeerByID(long beerID) {
-        breweryRepo.deleteById(beerID);
+    public void deleteBreweryByID(long brewID) {
+        breweryRepo.deleteById(brewID);
     }
     
 }//end class
