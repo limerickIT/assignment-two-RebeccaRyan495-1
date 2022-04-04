@@ -21,9 +21,10 @@ namespace RESTAPICLIENT
         }
 
         [TestMethod]
-        public void TestGETMethodBrewery()
+        public void TestGET_ONEMethodBrewery()
         {
-            RestClient client = new RestClient("http://localhost:8888/breweries/HAOS");
+
+            RestClient client = new RestClient("http://localhost:8888/breweries/1");
             RestRequest request = new RestRequest(Method.GET);
             request.AddHeader("Accept", "text/html, application/xhtml+xml, application/xml;q=0.9, image/webp, */*;q=0.8");
 
